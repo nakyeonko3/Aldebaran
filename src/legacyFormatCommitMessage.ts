@@ -22,6 +22,12 @@ async function legacyFormatCommitMessage(): Promise<void> {
   let formattedMessage: string;
 
   const { mode } = detectCommitMode();
+  if (mode === "amend" || mode === "squash" || mode === "merge") {
+    console.log(
+      "Skipping commit message generation for amend, squash, or merge commits."
+    );
+    return;
+  }
 
   const tasks: Task[] = [
     {

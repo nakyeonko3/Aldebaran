@@ -18,7 +18,11 @@ async function legacyFormatCommitMessage() {
     let commitMsgFile;
     let commitMessage;
     let formattedMessage;
-    const commitMode = detectCommitMode();
+    const { mode } = detectCommitMode();
+    if (mode === "amend" || mode === "squash" || mode === "merge") {
+        console.log("Skipping commit message generation for amend, squash, or merge commits.");
+        return;
+    }
     const tasks = [
         {
             text: "Retrieving branch information",
@@ -56,7 +60,7 @@ async function legacyFormatCommitMessage() {
                         break;
                     }
                 }
-                const formattedTitle = await formatTitle(branchName, title, commitMode.mode);
+                const formattedTitle = await formatTitle(branchName, title, mode);
                 const formattedLines = [formattedTitle, ...lines.slice(bodyStartIndex)];
                 formattedMessage = formattedLines.join("\n");
             },
@@ -74,7 +78,7 @@ async function legacyFormatCommitMessage() {
         successMessage: "byul has formatted the commit message.",
         failedMessage: "byul encountered an error while processing the commit message.",
     };
-    if (commitMode.mode === "message") {
+    if (mode === "message") {
         console.log(`${ANSI_COLORS.cyan}ℹ️ Commit message mode detected. Formatting will be applied after message is written.${ANSI_COLORS.reset}`);
         await new Taskl(options).runTasks();
     }

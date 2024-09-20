@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { Taskl } from "taskl";
 import { legacyFormatCommitMessage } from "./legacyFormatCommitMessage.js";
+import { detectCommitMode } from "./detectCommitMode.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config();
@@ -99,6 +100,11 @@ async function generateCommitMessage(commitMsgFile) {
     let changesSummary;
     let issueNumber;
     let commitMessage;
+    const { mode } = detectCommitMode();
+    if (mode === "amend" || mode === "squash" || mode === "merge") {
+        console.log("Skipping commit message generation for amend, squash, or merge commits.");
+        return;
+    }
     config = getByulConfig();
     if (!config.commitTypes) {
         console.warn(`${ANSI_COLORS.yellow}Warning: No commit types defined in byul.config.json file.${ANSI_COLORS.reset}`);
